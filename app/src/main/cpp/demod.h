@@ -30,6 +30,7 @@ extern uint32_t address;
 extern PhaseDiscriminators phaseDiscri;
 extern Lowpass<double> lowpassBaud;
 extern MovingAverageUtil<double, double, 2048> preambleMovingAverage;
+extern double magsqRaw;
 
 void processOneSample(int8_t i, int8_t q);
 

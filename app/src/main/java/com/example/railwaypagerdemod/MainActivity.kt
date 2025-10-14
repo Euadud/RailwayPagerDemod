@@ -50,6 +50,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var speedLabel: TextView
     private lateinit var mileageLabel: TextView
 
+    // 信号强度条
+    private lateinit var signalLabel: TextView
+    private lateinit var signalStrengthBar: ProgressBar
+
     // 记录上次消息，避免重复响铃
     private var lastLog = ""
 
@@ -89,7 +93,17 @@ class MainActivity : AppCompatActivity() {
         rootLayout.addView(speedLabel)
         rootLayout.addView(mileageLabel)
 
-        // 输入框
+        // === 信号强度条 ===
+        signalLabel = createInfoLabel("信号强度: -")
+        signalStrengthBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            max = 100
+            progress = 0
+            progressDrawable = getDrawable(android.R.drawable.progress_horizontal)
+        }
+        rootLayout.addView(signalLabel)
+        rootLayout.addView(signalStrengthBar)
+
+        // === 输入框 ===
         val hostEdit = TextInputEditText(this).apply {
             hint = "主机名"
             setText("127.0.0.1")
@@ -101,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         rootLayout.addView(TextInputLayout(this).apply { addView(hostEdit) })
         rootLayout.addView(TextInputLayout(this).apply { addView(portEdit) })
 
-        // 输出文本框
+        // === 输出文本框 ===
         outputText = MaterialTextView(this).apply {
             textSize = 14f
             setBackgroundColor(Color.WHITE)
@@ -111,11 +125,15 @@ class MainActivity : AppCompatActivity() {
         }
         scrollView = ScrollView(this).apply {
             addView(outputText)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+            )
         }
         rootLayout.addView(scrollView)
 
-        // 连接按钮
+        // === 连接按钮 ===
         val button = MaterialButton(this).apply {
             text = "连接"
             setOnClickListener {
@@ -152,8 +170,15 @@ class MainActivity : AppCompatActivity() {
                     outputText.append(logs + "\n")
                     scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
                     parseMsgAndUpdateUI(logs)
-                    playNotificationSound() // 🔔 新消息时响铃
+                    playNotificationSound()
                 }
+
+                // === 刷新信号强度 ===
+                val strength = getSignalStrength()
+                val percent = (strength * 100).toInt()
+                signalStrengthBar.progress = percent
+                signalLabel.text = "信号强度: $percent%"
+
                 handler.postDelayed(this, 200)
             }
         })
@@ -212,10 +237,12 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    // === JNI 外部函数声明 ===
     external fun startClientAsync(host: String, port: String)
     external fun pollMessages(): String
     external fun nativeStopClient()
     external fun decodeMessageNative(msg: String): ParsedMessage
+    external fun getSignalStrength(): Float
 
     companion object {
         init { System.loadLibrary("railwaypagerdemod") }

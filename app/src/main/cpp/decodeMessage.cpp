@@ -80,7 +80,8 @@ ParsedMessage parseMessage(const std::string &msg) {
         trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\n'), trimmed.end());
 
         std::istringstream iss(trimmed);
-        iss >> p.trainNo >> p.speed >> p.mileage;
+        std::string dummy;
+        iss >> dummy >> p.trainNo >> p.speed >> p.mileage;
 
         p.latitude = "0";
         p.longitude = "0";

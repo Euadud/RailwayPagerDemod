@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include "demod.h"
 
-#define BUF_SIZE 4096
+#define BUF_SIZE 8192
 
 static std::thread workerThread;
 static std::atomic<bool> running(false);
@@ -158,4 +158,14 @@ Java_com_example_railwaypagerdemod_MainActivity_pollMessages(JNIEnv* env, jobjec
     messageBuffer.clear();
 
     return env->NewStringUTF(ss.str().c_str());
+}
+
+extern "C"
+JNIEXPORT jfloat JNICALL
+Java_com_example_railwaypagerdemod_MainActivity_getSignalStrength(JNIEnv*, jobject) {
+    double value = magsqRaw;
+    if (value > 0.5) value = 0.5;
+    if (value < 0.0) value = 0.0;
+    float percent = (float) value / 0.5;
+    return percent; // 映射为 0~1
 }

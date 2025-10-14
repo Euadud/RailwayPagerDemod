@@ -207,16 +207,18 @@ class hackrf_tcp(gr.top_block, Qt.QWidget):
         self.network_tcp_sink_0 = network.tcp_sink(gr.sizeof_char, 1, '127.0.0.1', 1234,2)
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_interleaved_char_to_complex_0 = blocks.interleaved_char_to_complex(False,127)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/jason/Desktop/capture3.iq', True, 0, 0)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/jason/Downloads/20251014-105228_z385_RTLSDR_821237500Hz_2MSps.iq', True, 233578496, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_complex_to_interleaved_char_0 = blocks.complex_to_interleaved_char(False, 127)
+        self.blocks_add_const_vxx_1_0 = blocks.add_const_bb(0b10000000)
 
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.blocks_add_const_vxx_1_0, 0), (self.blocks_interleaved_char_to_complex_0, 0))
         self.connect((self.blocks_complex_to_interleaved_char_0, 0), (self.network_tcp_sink_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_interleaved_char_to_complex_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.blocks_add_const_vxx_1_0, 0))
         self.connect((self.blocks_interleaved_char_to_complex_0, 0), (self.blocks_throttle2_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_time_sink_x_0, 0))

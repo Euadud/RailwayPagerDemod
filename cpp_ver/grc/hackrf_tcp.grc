@@ -45,6 +45,40 @@ blocks:
     coordinate: [200, 12]
     rotation: 0
     state: enabled
+- name: analog_wfm_rcv_0
+  id: analog_wfm_rcv
+  parameters:
+    affinity: ''
+    alias: ''
+    audio_decimation: '4'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    quad_rate: 48000*4
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [664, 24.0]
+    rotation: 0
+    state: disabled
+- name: audio_sink_1
+  id: audio_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    device_name: ''
+    num_inputs: '1'
+    ok_to_block: 'True'
+    samp_rate: '44100'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [888, 56.0]
+    rotation: 0
+    state: disabled
 - name: blocks_add_const_vxx_0
   id: blocks_add_const_vxx
   parameters:
@@ -81,6 +115,24 @@ blocks:
     coordinate: [1040, 256.0]
     rotation: 0
     state: disabled
+- name: blocks_add_const_vxx_1_0
+  id: blocks_add_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '0b10000000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [248, 168.0]
+    rotation: 0
+    state: enabled
 - name: blocks_complex_to_interleaved_char_0
   id: blocks_complex_to_interleaved_char
   parameters:
@@ -123,11 +175,11 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /home/jason/Desktop/capture3.iq
+    file: /home/jason/Downloads/20251014-105228_z385_RTLSDR_821237500Hz_2MSps.iq
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
-    offset: '0'
+    offset: '233578496'
     repeat: 'True'
     type: byte
     vlen: '1'
@@ -135,7 +187,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 144.0]
+    coordinate: [24, 136.0]
     rotation: 0
     state: enabled
 - name: blocks_interleaved_char_to_complex_0
@@ -858,13 +910,15 @@ blocks:
     state: enabled
 
 connections:
+- [analog_wfm_rcv_0, '0', audio_sink_1, '0']
 - [blocks_add_const_vxx_0, '0', blocks_keep_one_in_n_0, '0']
 - [blocks_add_const_vxx_1, '0', network_tcp_sink_0, '0']
+- [blocks_add_const_vxx_1_0, '0', blocks_interleaved_char_to_complex_0, '0']
 - [blocks_complex_to_interleaved_char_0, '0', blocks_add_const_vxx_1, '0']
 - [blocks_complex_to_interleaved_char_0, '0', epy_block_0, '0']
 - [blocks_complex_to_interleaved_char_0, '0', network_tcp_sink_0, '0']
 - [blocks_file_source_0, '0', blocks_add_const_vxx_0, '0']
-- [blocks_file_source_0, '0', blocks_interleaved_char_to_complex_0, '0']
+- [blocks_file_source_0, '0', blocks_add_const_vxx_1_0, '0']
 - [blocks_interleaved_char_to_complex_0, '0', blocks_throttle2_0, '0']
 - [blocks_throttle2_0, '0', qtgui_freq_sink_x_0, '0']
 - [blocks_throttle2_0, '0', qtgui_time_sink_x_0, '0']
@@ -873,6 +927,7 @@ connections:
 - [osmosdr_source_0, '0', blocks_file_sink_0, '0']
 - [osmosdr_source_0, '0', qtgui_freq_sink_x_0, '0']
 - [osmosdr_source_0, '0', qtgui_waterfall_sink_x_0, '0']
+- [rational_resampler_xxx_0, '0', analog_wfm_rcv_0, '0']
 - [rational_resampler_xxx_0, '0', blocks_complex_to_interleaved_char_0, '0']
 
 metadata:

@@ -23,6 +23,8 @@ int parity_errors;                 // Count of parity errors in current message
 int bch_errors;                    // Count of BCH errors in current message
 int batch_num;                  // Count of batches in current transmission
 
+double magsqRaw;
+
 int pop_cnt(uint32_t cw) {
     int cnt = 0;
     for (int i = 0; i < 32; i++) {
@@ -266,11 +268,9 @@ void processOneSample(int8_t i, int8_t q) {
 
     std::complex<float> iq(fi, fq);
 
-    double magsqRaw;
     float deviation;
     double fmDemod = phaseDiscri.phaseDiscriminatorDelta(iq, magsqRaw, deviation);
     // printf("fmDemod: %.3f\n", fmDemod);
-    double magsq = magsqRaw / (SDR_RX_SCALED * SDR_RX_SCALED);
     
     double filt = lowpassBaud.filter(fmDemod);
 
