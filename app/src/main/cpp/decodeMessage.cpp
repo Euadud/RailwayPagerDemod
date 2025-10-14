@@ -8,7 +8,7 @@
 
 struct ParsedMessage {
     std::string vehicleId;
-    std::vector<std::string> routeCandidates;
+    std::string route;
     std::string latitude;
     std::string longitude;
     std::string trainNo;
@@ -35,9 +35,9 @@ std::vector<int> str_to_nibbles(const std::string &s) {
     return nibbles;
 }
 
-std::vector<std::string> decode_gb2312_candidates(const std::string &numeric_field) {
+std::string decode_gb2312(const std::string &numeric_field) {
     auto nibbles = str_to_nibbles(numeric_field);
-    std::set<std::string> results;
+    std::vector<std::string> results;
 
     for (bool reverse_bits : {false, true}) {
         for (bool high_first : {false, true}) {
@@ -50,16 +50,15 @@ std::vector<std::string> decode_gb2312_candidates(const std::string &numeric_fie
                 tmp.push_back(byte);
             }
             if (std::any_of(tmp.begin(), tmp.end(), [](unsigned char c) { return c >= 0xA1; })) {
-                results.insert(tmp);
+                results.push_back(tmp);
             }
         }
     }
-    return std::vector<std::string>(results.begin(), results.end());
+    return std::string(results.at(1));
 }
 
+ParsedMessage p;
 ParsedMessage parseMessage(const std::string &msg) {
-    ParsedMessage p;
-
     // 简化：用前缀区分地址类型
     if (msg.find("1234002") != std::string::npos) {
         p.vehicleId = msg.substr(15, 8);
@@ -72,7 +71,7 @@ ParsedMessage parseMessage(const std::string &msg) {
 
         p.latitude = std::to_string(latitude);
         p.longitude = std::to_string(longitude);
-        p.routeCandidates = decode_gb2312_candidates(routeRaw);
+        p.route = decode_gb2312(routeRaw);
     }
     else if (msg.find("1234000") != std::string::npos) {
         std::string trimmed = msg;
@@ -96,32 +95,27 @@ Java_com_example_railwaypagerdemod_MainActivity_decodeMessageNative(
         JNIEnv *env, jobject thiz, jstring jmsg) {
 
     const char *cmsg = env->GetStringUTFChars(jmsg, nullptr);
-    ParsedMessage parsed = parseMessage(std::string(cmsg));
+    p = parseMessage(std::string(cmsg));
     env->ReleaseStringUTFChars(jmsg, cmsg);
 
     jclass cls = env->FindClass("com/example/railwaypagerdemod/ParsedMessage");
     jmethodID ctor = env->GetMethodID(cls, "<init>",
-                                      "(Ljava/lang/String;[[BLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+                                      "(Ljava/lang/String;[BLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 
-    jstring vehicleId = env->NewStringUTF(parsed.vehicleId.c_str());
-    jstring latitude = env->NewStringUTF(parsed.latitude.c_str());
-    jstring longitude = env->NewStringUTF(parsed.longitude.c_str());
-    jstring trainNo = env->NewStringUTF(parsed.trainNo.c_str());
-    jstring speed = env->NewStringUTF(parsed.speed.c_str());
-    jstring mileage = env->NewStringUTF(parsed.mileage.c_str());
+    jstring vehicleId = env->NewStringUTF(p.vehicleId.c_str());
+    jstring latitude = env->NewStringUTF(p.latitude.c_str());
+    jstring longitude = env->NewStringUTF(p.longitude.c_str());
+    jstring trainNo = env->NewStringUTF(p.trainNo.c_str());
+    jstring speed = env->NewStringUTF(p.speed.c_str());
+    jstring mileage = env->NewStringUTF(p.mileage.c_str());
+    jbyteArray route_arr = env->NewByteArray(p.route.size());
+    env->SetByteArrayRegion(route_arr, 0, p.route.size(),
+                            reinterpret_cast<const jbyte*>(p.route.data()));
 
     jclass byteArrCls = env->FindClass("[B");
-    jobjectArray routeArray = env->NewObjectArray(parsed.routeCandidates.size(), byteArrCls, nullptr);
-    for (size_t i = 0; i < parsed.routeCandidates.size(); ++i) {
-        const std::string &s = parsed.routeCandidates[i];
-        jbyteArray arr = env->NewByteArray(s.size());
-        env->SetByteArrayRegion(arr, 0, s.size(), reinterpret_cast<const jbyte*>(s.data()));
-        env->SetObjectArrayElement(routeArray, i, arr);
-        env->DeleteLocalRef(arr);
-    }
 
     jobject obj = env->NewObject(cls, ctor,
-                                 vehicleId, routeArray, latitude, longitude, trainNo, speed, mileage);
+                                 vehicleId, route_arr, latitude, longitude, trainNo, speed, mileage);
 
     env->DeleteLocalRef(vehicleId);
     env->DeleteLocalRef(latitude);

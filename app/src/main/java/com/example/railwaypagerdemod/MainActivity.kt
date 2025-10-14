@@ -1,5 +1,6 @@
 package com.example.railwaypagerdemod
 
+import android.R
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Bundle
@@ -19,18 +20,13 @@ import com.google.android.material.textview.MaterialTextView
 
 class ParsedMessage(
     val vehicleId: String,
-    val routeCandidatesBytes: Array<ByteArray>,
+    val route: ByteArray,
     val latitude: String,
     val longitude: String,
     val trainNo: String,
     val speed: String,
     val mileage: String
-) {
-    val routeCandidates: Array<String>
-        get() = routeCandidatesBytes.map { bytes ->
-            try { String(bytes, charset("GB2312")) } catch (e: Exception) { "(无法解码)" }
-        }.toTypedArray()
-}
+)
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,7 +39,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var routeLabel: TextView
     private lateinit var latitudeLabel: TextView
     private lateinit var longitudeLabel: TextView
-    private lateinit var routeCandidatesLayout: LinearLayout
 
     // 地址 1234000 信息区
     private lateinit var trainNoLabel: TextView
@@ -78,7 +73,6 @@ class MainActivity : AppCompatActivity() {
         routeLabel = createInfoLabel("线路: -", bold = true)
         latitudeLabel = createInfoLabel("纬度: -")
         longitudeLabel = createInfoLabel("经度: -")
-        routeCandidatesLayout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
 
         trainNoLabel = createInfoLabel("车次号: -")
         speedLabel = createInfoLabel("速度: -")
@@ -86,7 +80,6 @@ class MainActivity : AppCompatActivity() {
 
         rootLayout.addView(vehicleIdLabel)
         rootLayout.addView(routeLabel)
-        rootLayout.addView(routeCandidatesLayout)
         rootLayout.addView(latitudeLabel)
         rootLayout.addView(longitudeLabel)
         rootLayout.addView(trainNoLabel)
@@ -207,19 +200,11 @@ class MainActivity : AppCompatActivity() {
                     latitudeLabel.text = "纬度: ${parsed.latitude}"
                     longitudeLabel.text = "经度: ${parsed.longitude}"
 
-                    routeLabel.text = "线路: ${parsed.routeCandidates.firstOrNull() ?: "(无法解码)"}"
-                    routeCandidatesLayout.removeAllViews()
-                    if (parsed.routeCandidates.size > 1) {
-                        parsed.routeCandidates.drop(1).forEachIndexed { idx, route ->
-                            val tv = TextView(this).apply {
-                                text = "候选${idx + 2}: $route"
-                                setTextColor(Color.WHITE)
-                                textSize = 14f
-                                setPadding(16, 2, 0, 2)
-                            }
-                            routeCandidatesLayout.addView(tv)
-                        }
-                    }
+                    val route_str = _root_ide_package_.java.lang.String(
+                        parsed.route,
+                        "GB2312"
+                    );
+                    routeLabel.text = "线路: ${route_str ?: "(无法解码)"}"
                 }
 
                 // 如果是车次/速度/公里标 → 1234000
