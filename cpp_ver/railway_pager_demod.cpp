@@ -12,7 +12,7 @@ int main(void) {
 
     int sockfd;
     struct sockaddr_in servaddr;
-    int8_t buffer[BUF_SIZE];
+    uint8_t buffer[BUF_SIZE];
     ssize_t n;
 
     // 1. Create socket
@@ -47,25 +47,18 @@ int main(void) {
     //     is_message_ready = false;
     // }
 
-    const int DECIM = 5; // sample rate is 240000Hz
+    const int DECIM = 5;
     int decim_counter = 0;
-    int32_t acc_i = 0, acc_q = 0;
+    uint32_t acc_i = 0, acc_q = 0;
 
     while ((n = read(sockfd, buffer, BUF_SIZE)) > 0) {
         for (int j = 0; j < n; j += 2) {
-            int8_t i = buffer[j];
-            int8_t q = buffer[j+1];
-
-            acc_i += i;
-            acc_q += q;
-            decim_counter++;
-
-            if (decim_counter == DECIM) {
-                int8_t i_ds = acc_i / DECIM;
-                int8_t q_ds = acc_q / DECIM;
-
+            acc_i += buffer[j];
+            acc_q += buffer[j + 1];
+            if (++decim_counter == DECIM) {
+                int8_t i_ds = (int8_t)(((float) acc_i / DECIM) - 128);
+                int8_t q_ds = (int8_t)(((float) acc_q / DECIM) - 128);
                 // printf("%d %d\n", i_ds, q_ds);
-
                 processOneSample(i_ds, q_ds);
                 acc_i = acc_q = 0;
                 decim_counter = 0;

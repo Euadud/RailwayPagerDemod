@@ -29,7 +29,7 @@ Java_com_example_railwaypagerdemod_MainActivity_nativeStopClient(JNIEnv*, jobjec
 void clientThread(std::string host, int port) {
     int sockfd;
     struct sockaddr_in servaddr;
-    int8_t buffer[BUF_SIZE];
+    uint8_t buffer[BUF_SIZE];
     ssize_t n;
 
     lowpassBaud.create(301, SAMPLE_RATE, BAUD_RATE * 5.0f);
@@ -64,26 +64,24 @@ void clientThread(std::string host, int port) {
 
     const int DECIM = 5;
     int decim_counter = 0;
-    int32_t acc_i = 0, acc_q = 0;
+    uint32_t acc_i = 0, acc_q = 0;
 
     while (running && (n = read(sockfd, buffer, BUF_SIZE)) > 0) {
-//        for (int j = 0; j < BUF_SIZE; j += 2) {
-//            int8_t i = (int8_t)(buffer[j] - 128);
-//            int8_t q = (int8_t)(buffer[j+1] - 128);
-//            processOneSample(i, q);
-//        }
 
         for (int j = 0; j < n; j += 2) {
-            int8_t i = buffer[j];
-            int8_t q = buffer[j+1];
-
-            acc_i += i;
-            acc_q += q;
-            decim_counter++;
-
-            if (decim_counter == DECIM) {
-                int8_t i_ds = acc_i / DECIM;
-                int8_t q_ds = acc_q / DECIM;
+            acc_i += buffer[j];
+            acc_q += buffer[j + 1];
+            if (++decim_counter == DECIM) {
+                int8_t i_ds = (int8_t)(((float) acc_i / DECIM) - 128);
+                int8_t q_ds = (int8_t)(((float) acc_q / DECIM) - 128);
+//                char buf[32];
+//                sprintf(buf, "%d %d\n", i_ds, q_ds);
+//                std::ostringstream ss;
+//                ss << buf;
+//                {
+//                    std::lock_guard<std::mutex> lock(msgMutex);
+//                    messageBuffer.push_back(ss.str());
+//                }
                 processOneSample(i_ds, q_ds);
                 acc_i = acc_q = 0;
                 decim_counter = 0;
